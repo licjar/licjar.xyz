@@ -1,0 +1,60 @@
+---
+interface Props {
+  theme: 'etc' | 'about' | 'blog' | 'misc';
+}
+
+const { theme } = Astro.props;
+
+const themeClass = `nav-${theme}`;
+---
+
+<nav class={themeClass}>
+    <div class="wrapper">
+        <a href="/" class='top'>
+        <img src="/images/expo-logo.png" class="top-logo"
+        width = 32
+        height = 32
+        >
+        </a>
+        <a href="/about" class='about'>ABOUT</a>
+        <a href="/blog" class='blog'>BLOG</a>
+        <a href="/misc" class='misc'>MISC</a>
+    </div>
+</nav>
+
+<style>
+    .wrapper {
+        padding-inline: 2rem;
+		margin-inline: auto;
+		max-width: 48rem;
+        display: flex;
+    }
+
+    nav {
+        border-bottom: 15px solid transparent;
+        }
+    nav a:not(.top) {
+        text-align: center;
+        padding: 1rem 1.5rem;
+        text-decoration: none;
+        font-weight: bold;
+        }
+
+    .top {
+        display: flex;
+        align-items: center;
+        padding: 0 1rem;
+        background-color: #132028;
+        }
+    .top-logo {
+        height: 2rem;
+        display: block
+        }
+    .nav-etc { border-bottom-color: #f8c067; }
+    .nav-about { border-bottom-color: #ff83a8; }
+    .about { background-color: #ff83a8; color:#132028}
+    .nav-blog { border-bottom-color: #f8fc5d; }
+    .blog { background-color: #f8fc5d; color:#132028 }
+    .nav-misc { border-bottom-color: #3fdee2 }
+    .misc { background-color: #3fdee2; color: #132028; }
+</style>

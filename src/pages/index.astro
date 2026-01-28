@@ -1,16 +1,116 @@
 ---
-
+import Layout from "../layouts/Layout.astro";
 ---
 
-<html lang="en">
-	<head>
-		<meta charset="utf-8" />
-		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-		<meta name="viewport" content="width=device-width" />
-		<meta name="generator" content={Astro.generator} />
-		<title>Astro</title>
-	</head>
-	<body>
-		<h1>A is for Astronaut</h1>
-	</body>
-</html>
+<Layout title="Home" theme="top" header={false}, footer={false}>
+  <div class="radial-container">
+	<div id="stage" class="stage">
+	  <div class="pivot-point">
+        <a href="/about" class="radial-link about">ABOUT</a>
+        <a href="/blog" class="radial-link blog">BLOG</a>
+        <a href="/misc" class="radial-link misc">MISC</a>
+      </div>
+	</div>
+  </div>
+</Layout>
+
+<style>
+  .radial-container {
+    display: flex;
+	align-items: center;
+	justify-content: flex-start;
+    width: 100vw;
+    height: 100vh;
+    overflow: hidden;
+  }
+  
+  .stage {
+	width: 1080px;
+	height: 1080px;	
+    position: relative;
+	transform-origin: left center;
+  }
+
+  .pivot-point {
+    position: absolute;
+    left: 10%;
+    top: 45%;
+    transform: translateY(-50%);
+  }
+
+  .radial-link {
+    position: absolute;
+    white-space: nowrap;
+    text-decoration: none;
+    font-weight: bold;
+    font-size: 5rem;
+    color: var(--link-color);
+   
+    transform-origin: left center;
+    padding-left: 250px;
+	transition: color 0.2s ease;
+  }
+
+  .radial-link:hover {
+	color: #132028
+  }
+
+  .about {
+    transform: rotate(-45deg);
+  }
+
+  .blog {
+    transform: rotate(0deg);
+  }
+
+  .misc {
+    transform: rotate(45deg);
+  }
+
+  .radial-link::before {
+    content: "";
+    position: absolute;
+
+    left: 0;
+    top: 50%;
+    transform-origin: left center;
+	transform: translateY(-50%);
+	z-index: -1;
+
+    width: 3400px;
+    height: 2000px;
+
+    background: var(--link-color);
+    opacity: 0.2;
+    transition: opacity 0.2s ease;
+
+    clip-path: polygon(5% 52.5%, 5% 47.5%, 100% 0, 100% 100%);
+  }
+
+  .radial-link:hover::before {
+    opacity: 1;
+  }
+
+  .about { --link-color: #ff83a8; }
+  .blog  { --link-color: #f8fc5d; }
+  .misc  { --link-color: #3fdee2; }
+</style>
+
+
+<script>
+
+const stage = document.getElementById('stage');
+
+function resize() {
+  const width = window.innerWidth;
+  const height = window.innerHeight;
+
+  const scale = Math.min(width / 1080, height / 1080);
+
+  stage.style.transform = `scale(${scale})`;
+}
+
+window.addEventListener('resize', resize);
+resize();
+
+</script>

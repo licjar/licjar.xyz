@@ -1,0 +1,36 @@
+---
+interface Props {
+  theme: 'etc' | 'about' | 'blog' | 'misc';
+}
+
+const { theme } = Astro.props;
+---
+<footer class={theme}>
+    <span>
+        <a href="/">licjar</a>, <a href="/about">CC BY-SA 4.0</a>
+    </span>
+</footer>
+
+<style>
+
+footer {
+    grid-row: main-end / bottom;
+    display: grid;
+    border-top: 15px solid;
+    min-height: 60px;
+    place-items: center;
+}
+
+.about {
+    border-top-color: #ff83a8;
+}
+.blog {
+    border-top-color: #f8fc5d;
+}
+.misc {
+    border-top-color: #3fdee2;
+}
+.etc {
+    border-top-color: #f8c067;
+}
+</style>

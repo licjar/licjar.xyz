@@ -1,0 +1,123 @@
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+    border: 0 solid;
+}
+
+body {
+    background-color: #132028;
+    color: #fffef6; 
+    font-family: 'Noto Sans';
+    min-height: 100vh;
+    display: grid;
+    grid-template-rows: [top] auto [main-start] 1fr [main-end] auto [bottom];
+}
+
+a {
+    color: #f8c067
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  font-weight: 700;
+  line-height: 1.5;
+}
+
+h1 {
+  font-size: 1.75rem;
+}
+
+h2 {
+  font-size: 1.5rem;
+}
+
+h3 {
+  font-size: 1.2rem;
+}
+
+h4 {
+  font-size: 1.1rem;
+}
+
+h5,
+h6 {
+  font-size: 1rem;
+}
+
+.title {
+  text-align: center;
+  margin-block: 2rem;
+}
+
+#content-wrap {
+
+  justify-self: stretch;
+
+    & a {
+      text-decoration-line: underline;
+      text-decoration-thickness: 1.5px;
+      text-underline-offset: 4.5px;
+      margin-inline: 0.1em;
+    }
+
+    & p {
+      margin-block: 0.75rem;
+    }
+
+    & table {
+      display: block;
+      overflow-x: auto;
+      margin-block: 1rem;
+      text-align: center;
+
+      & th,
+      & td {
+        border: 1px solid ;
+        padding: 0.25rem 0.5rem;
+      }
+    }
+
+    & ul {
+      list-style-type: disc;
+    }
+    & ol {
+      list-style-type: decimal;
+    }
+    & li {
+      margin-block: 0.5rem;
+      margin-left: 1rem;
+      list-style-position: inside;
+      & p {
+        display: inline;
+      }
+    }
+    & h2 {
+      margin-top: 2rem;
+      margin-bottom: 1rem;
+      padding-inline-start: 1rem;
+      padding-block-end: .2rem;
+      border-inline-start: 1rem solid;
+      border-block-end: .2rem solid;
+    }
+    & h3 {
+      margin-top: 2rem;
+      margin-bottom: 1rem;
+    }
+    & h4 {
+      margin-top: 1.5rem;
+      margin-bottom: 0.75rem;
+    }
+    & h5 {
+      margin-top: 1rem;
+      margin-bottom: 0.5rem;
+    }
+    & h6 {
+      margin-top: 0.5rem;
+      margin-bottom: 0.25rem;
+    }
+}

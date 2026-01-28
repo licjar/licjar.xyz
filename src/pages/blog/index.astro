@@ -1,0 +1,49 @@
+---
+import Layout from "../../layouts/Layout.astro"
+import { formatDate } from "../../utils"
+import { getCollection } from "astro:content";
+
+const allPosts = await getCollection('blog');
+
+const sortedPosts = allPosts.sort((a, b) => 
+  b.data.date.valueOf() - a.data.date.valueOf()
+);
+
+---
+
+<Layout title = "BLOG" theme = "blog">
+    <ul>
+       {sortedPosts.map(post => (
+      <li>
+      <article>
+      <span>
+        <time>
+          {formatDate(post.data.date)}
+        </time>
+      </span>
+        <a href={`/blog/${post.id}`}>
+        <h2>{post.data.title}</h2>
+        </a>
+        <span>{post.data.desc}</span>
+      </li>
+      </article>
+      ))}
+    </ul>
+</Layout>
+
+<style>
+
+ul {
+  list-style: none;
+  justify-self: stretch;
+}
+
+li {
+  margin-block: 2rem;
+  padding-inline-start: 1rem;
+  padding-block-end: .5rem;
+  border-inline-start: 1rem solid;
+  border-block-end: .2rem solid;
+}
+
+</style>
