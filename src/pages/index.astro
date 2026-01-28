@@ -2,7 +2,7 @@
 import Layout from "../layouts/Layout.astro";
 ---
 
-<Layout title="Home" theme="top" header={false}, footer={false}>
+<Layout title="LICJAR.XYZ" theme="top" header={false}, footer={false}>
   <div class="radial-container">
 	<div id="stage" class="stage">
 	  <div class="pivot-point">
@@ -27,7 +27,7 @@ import Layout from "../layouts/Layout.astro";
   .stage {
 	width: 1080px;
 	height: 1080px;	
-    position: relative;
+  position: relative;
 	transform-origin: left center;
   }
 
@@ -96,21 +96,20 @@ import Layout from "../layouts/Layout.astro";
   .misc  { --link-color: #3fdee2; }
 </style>
 
+<script is:inline>
+  (function() {
+    const stage = document.getElementById('stage');
+    if (!stage) return;
 
-<script>
+    function resize() {
+      const width = window.innerWidth;
+      const height = window.innerHeight;
+      const scale = Math.min(width / 1080, height / 1080);
+      stage.style.transform = `scale(${scale})`;
+    }
 
-const stage = document.getElementById('stage');
+    resize();
 
-function resize() {
-  const width = window.innerWidth;
-  const height = window.innerHeight;
-
-  const scale = Math.min(width / 1080, height / 1080);
-
-  stage.style.transform = `scale(${scale})`;
-}
-
-window.addEventListener('resize', resize);
-resize();
-
+    window.addEventListener('resize', resize);
+  })();
 </script>

@@ -8,7 +8,7 @@
 body {
     background-color: #132028;
     color: #fffef6; 
-    font-family: 'Noto Sans';
+    font-family: 'Noto Sans Variable';
     min-height: 100vh;
     display: grid;
     grid-template-rows: [top] auto [main-start] 1fr [main-end] auto [bottom];
