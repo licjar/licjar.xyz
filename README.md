@@ -1,2 +1,1 @@
-# licjar.github.io
-GitHub Pages
+# licjar.xyz
