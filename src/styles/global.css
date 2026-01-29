@@ -68,6 +68,9 @@ h6 {
     & p {
       margin-block: 0.75rem;
     }
+      & strong {
+        font-weight: bolder;
+      }
 
     & table {
       display: block;

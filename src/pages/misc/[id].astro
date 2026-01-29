@@ -4,7 +4,7 @@ import { formatDate } from "../../utils"
 import Layout from "../../layouts/Layout.astro";
 
 export async function getStaticPaths() {
-  const posts = await getCollection('blog');
+  const posts = await getCollection('misc');
   return posts.map(post => ({
     params: { id: post.id }, 
     props: { post },
@@ -15,7 +15,7 @@ const { post } = Astro.props;
 const { Content } = await render(post);
 ---
 
-<Layout title = `${post.data.title} - BLOG` theme = "blog">
+<Layout title = `${post.data.title} - MISC` theme = "misc">
     <article id="content-wrap">
       <div class="title">
         <h1>{post.data.title}</h1>

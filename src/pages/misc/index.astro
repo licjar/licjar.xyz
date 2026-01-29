@@ -1,12 +1,66 @@
 ---
-import Layout from "../../layouts/Layout.astro";
+import Layout from "../../layouts/Layout.astro"
+import { formatDate } from "../../utils"
+import { getCollection } from "astro:content";
+
+const allPosts = await getCollection('misc');
+
+const sortedPosts = allPosts.sort((a, b) => 
+  b.data.date.valueOf() - a.data.date.valueOf()
+);
+
 ---
 
-<Layout title="MISC" theme="misc">
-    <article id="content-wrap">
-        <div class="title">
-        <h1>工事中</h1>
-        <p>Out of Service</p>
-        </div>
-    </article>
+<Layout title = "MISC" theme = "misc">
+    <section class="grid">
+       {sortedPosts.map(post => (
+        <a class="card" href={`/misc/${post.id}`}>
+        <article>
+        <span>
+            <time>
+            {formatDate(post.data.date)}
+            </time>
+        </span>
+            <h3>{post.data.title}</h3>
+            <span>{post.data.desc}</span>
+        </article></a>
+        ))}
+    </section>
 </Layout>
+
+<style>
+
+.grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, 23rem);
+    grid-template-rows: repeat(auto-fit, 10rem);
+    gap: 0rem;
+    justify-self: stretch;
+}
+
+.card {
+    overflow: hidden;
+}
+
+a {
+    text-decoration: none;
+    color: #fffef6;
+    transition: .2s ease;
+}
+
+a:hover {
+    color: #f8c067;
+}
+
+article {
+  margin-block-start: 2rem;
+  margin-inline-end: 2rem;
+  padding-inline: 1rem;
+  padding-block: .5rem;
+  border-inline-start: 1rem solid;
+  border-block-end: .2rem solid;
+  border-inline-end: .1rem solid;
+  border-block-start: .1rem solid;
+}
+
+</style>

@@ -11,4 +11,5 @@ export default defineConfig({
     layout: 'constrained', 
     responsiveStyles: true,
   },
+  site: 'https://licjar.xyz',
 });

@@ -17,6 +17,7 @@ const { title, theme, header=true, footer=true} = Astro.props;
 <html lang="ja">
 	<head>
 		<meta charset="utf-8" />
+		<link rel="alternate" type="application/rss+xml" title="LICJAR.XYZ" href={new URL("rss.xml", Astro.site)} />
 		<link rel="icon" type="image/png" href="/images/expo-center.png" />
 		<meta name="viewport" content="width=device-width" />
 		<meta name="generator" content={Astro.generator} />
