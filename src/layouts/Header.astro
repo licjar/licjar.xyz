@@ -19,6 +19,12 @@ const themeClass = `nav-${theme}`;
         <a href="/about" class='about'>ABOUT</a>
         <a href="/blog" class='blog'>BLOG</a>
         <a href="/misc" class='misc'>MISC</a>
+        <a href="/rss.xml" class='rss'>
+        <img src="/images/rss.svg" class="rss-logo"
+        width = 32
+        height= 32
+        >
+        </a>
     </div>
 </nav>
 
@@ -33,7 +39,7 @@ const themeClass = `nav-${theme}`;
     nav {
         border-bottom: 15px solid transparent;
         }
-    nav a:not(.top) {
+    nav a:not(.top, .rss) {
         text-align: center;
         padding: 1rem 1.5rem;
         text-decoration: none;
@@ -50,6 +56,16 @@ const themeClass = `nav-${theme}`;
         height: 2rem;
         display: block
         }
+    .rss {
+        display: flex;
+        align-items: center;
+        padding: 0 1rem;
+        background-color: #3288d3;
+        }
+    .rss-logo {
+        height: 2rem;
+        display: block;
+    }
     .nav-etc { border-bottom-color: #f8c067; }
     .nav-about { border-bottom-color: #ff83a8; }
     .about { background-color: #ff83a8; color:#132028}
