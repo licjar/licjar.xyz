@@ -12,6 +12,7 @@
     "@astrojs/mdx": "^4.3.9",
     "@astrojs/rss": "^4.0.15",
     "@fontsource-variable/noto-sans": "^5.2.10",
+    "@fontsource-variable/source-code-pro": "^5.2.7",
     "astro": "^5.15.3"
   }
 }
