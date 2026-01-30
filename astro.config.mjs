@@ -12,4 +12,9 @@ export default defineConfig({
     responsiveStyles: true,
   },
   site: 'https://licjar.xyz',
+  markdown: {
+    shikiConfig: {
+      theme: 'css-variables',
+    },
+  },
 });
