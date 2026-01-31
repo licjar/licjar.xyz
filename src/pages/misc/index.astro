@@ -5,9 +5,13 @@ import { getCollection } from "astro:content";
 
 const allPosts = await getCollection('misc');
 
-const sortedPosts = allPosts.sort((a, b) => 
-  b.data.date.valueOf() - a.data.date.valueOf()
-);
+const sortedPosts = allPosts.sort((a, b) => {
+    const diff =  b.data.date.valueOf() - a.data.date.valueOf()
+    if (diff !== 0) {
+        return diff;
+    }
+    return a.id.localeCompare(b.id)
+});
 
 ---
 
