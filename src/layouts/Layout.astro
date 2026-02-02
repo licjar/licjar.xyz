@@ -13,6 +13,7 @@ interface Props {
 }
 
 const { title, theme, header=true, footer=true} = Astro.props;
+const canonicalURL = new URL(Astro.url.pathname.replace(/\/?$/, '/'), Astro.site);
 ---
 
 <html lang="ja">
@@ -20,6 +21,7 @@ const { title, theme, header=true, footer=true} = Astro.props;
 		<meta charset="utf-8" />
 		<link rel="alternate" type="application/rss+xml" title="LICJAR.XYZ" href={new URL("rss.xml", Astro.site)} />
 		<link rel="icon" type="image/png" href="/images/expo-center.png" />
+		<link rel="canonical" href={canonicalURL} />
 		<meta name="viewport" content="width=device-width" />
 		<meta name="generator" content={Astro.generator} />
 		<title>{title}</title>
