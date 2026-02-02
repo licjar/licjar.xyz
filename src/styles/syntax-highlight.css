@@ -1,0 +1,14 @@
+:root {
+  --astro-code-background: black;
+  --astro-code-color-text: #fffef6;
+
+  --astro-code-token-constant: #3fdee2;
+  --astro-code-token-string: #c4c8c4;
+  --astro-code-token-comment: #51a497;
+  --astro-code-token-keyword: #436bb6;
+  --astro-code-token-parameter: #fe8860;
+  --astro-code-token-function: #ff5871;
+  --astro-code-token-string-expression: #c4c8c4;
+  --astro-code-token-punctuation: #fffef6;
+  --astro-code-token-link: #f8c067;
+}

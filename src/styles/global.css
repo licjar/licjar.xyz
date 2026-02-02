@@ -1,6 +1,4 @@
-:root {
-  --astro-code-background: black;
-}
+@import "syntax-highlight.css";
 
 * {
     box-sizing: border-box;
