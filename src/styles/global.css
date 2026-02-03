@@ -56,6 +56,22 @@ h6 {
   margin-block: 2rem;
 }
 
+section[data-footnotes] {
+  border-top: 1px solid #fffef6;
+  margin-top: 3rem;
+  padding-top: 1rem;
+}
+
+#footnote-label {
+  display: none;
+  width: 0;
+  height:0;
+  padding: 0;
+  margin: 0;
+  overflow: hidden;
+  border-width: 0;
+}
+
 #content-wrap {
 
   justify-self: stretch;

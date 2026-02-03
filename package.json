@@ -13,6 +13,9 @@
     "@astrojs/rss": "^4.0.15",
     "@fontsource-variable/noto-sans": "^5.2.10",
     "@fontsource-variable/source-code-pro": "^5.2.7",
-    "astro": "^5.15.3"
+    "astro": "^5.15.3",
+    "rehype-katex": "^7.0.1",
+    "remark-denden-ruby": "^0.3.1",
+    "remark-math": "^6.0.0"
   }
 }

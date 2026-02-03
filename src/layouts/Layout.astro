@@ -22,6 +22,10 @@ const canonicalURL = new URL(Astro.url.pathname.replace(/\/?$/, '/'), Astro.site
 		<link rel="alternate" type="application/rss+xml" title="LICJAR.XYZ" href={new URL("rss.xml", Astro.site)} />
 		<link rel="icon" type="image/png" href="/images/expo-center.png" />
 		<link rel="canonical" href={canonicalURL} />
+		<link
+		rel="stylesheet"
+		href="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.css"
+		/>
 		<meta name="viewport" content="width=device-width" />
 		<meta name="generator" content={Astro.generator} />
 		<title>{title}</title>
