@@ -75,6 +75,7 @@ section[data-footnotes] {
 #content-wrap {
 
   justify-self: stretch;
+  text-align: justify;
 
     & a {
       text-decoration-line: underline;
@@ -95,6 +96,7 @@ section[data-footnotes] {
       overflow-x: auto;
       margin-block: 1rem;
       text-align: center;
+      border-collapse: collapse;
 
       & th,
       & td {
@@ -151,5 +153,9 @@ section[data-footnotes] {
       background-color: #000000;
       white-space: pre-wrap;
       line-height: 1.5;
+    }
+
+    & .katex {
+      margin-inline: 5px;
     }
 }
