@@ -81,6 +81,8 @@ section[data-footnotes] {
 
 #content-wrap {
 
+  justify-self: stretch;
+
     & a {
       text-decoration-line: underline;
       text-decoration-thickness: 1.5px;
