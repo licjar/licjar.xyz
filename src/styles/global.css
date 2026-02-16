@@ -20,6 +20,13 @@ a {
     color: #f8c067
 }
 
+code {
+    background-color: black;
+    padding-inline: 5px;
+    margin-inline: 5px;
+    font-family: 'Source Code Pro Variable';
+}
+
 h1,
 h2,
 h3,
@@ -74,9 +81,6 @@ section[data-footnotes] {
 
 #content-wrap {
 
-  justify-self: stretch;
-  text-align: justify;
-
     & a {
       text-decoration-line: underline;
       text-decoration-thickness: 1.5px;
@@ -86,6 +90,7 @@ section[data-footnotes] {
 
     & p {
       margin-block: 0.75rem;
+      text-align: justify;
     }
       & strong {
         font-weight: bolder;
@@ -143,16 +148,11 @@ section[data-footnotes] {
       margin-top: 0.5rem;
       margin-bottom: 0.25rem;
     }
-    & code {
-      background-color: black;
-      padding-inline: 5px;
-      margin-inline: 5px;
-      font-family: 'Source Code Pro Variable';
-    }
     & pre {
       background-color: #000000;
       white-space: pre-wrap;
       line-height: 1.5;
+      text-align: left;
     }
 
     & .katex {
