@@ -8,7 +8,10 @@ import remarkRuby from "remark-denden-ruby";
 
 // https://astro.build/config
 export default defineConfig({
-  integrations: [mdx()],
+  integrations: [mdx({
+    remarkPlugins: [remarkMath, remarkRuby],
+    rehypePlugins: [rehypeKatex],
+  })],
   image: {
     layout: 'constrained', 
     responsiveStyles: true,
@@ -18,10 +21,5 @@ export default defineConfig({
     shikiConfig: {
       theme: 'css-variables',
     },
-    remarkPlugins: [
-      remarkMath,
-      remarkRuby
-    ],
-    rehypePlugins: [rehypeKatex],
   },
 });
