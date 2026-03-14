@@ -9,11 +9,11 @@
     "astro": "astro"
   },
   "dependencies": {
-    "@astrojs/mdx": "^4.3.9",
-    "@astrojs/rss": "^4.0.15",
+    "@astrojs/mdx": "^5.0.0",
+    "@astrojs/rss": "^4.0.17",
     "@fontsource-variable/noto-sans": "^5.2.10",
     "@fontsource-variable/source-code-pro": "^5.2.7",
-    "astro": "^5.15.3",
+    "astro": "^6.0.4",
     "rehype-katex": "^7.0.1",
     "remark-denden-ruby": "^0.3.1",
     "remark-math": "^6.0.0"
