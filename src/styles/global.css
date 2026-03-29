@@ -112,6 +112,21 @@ section[data-footnotes] {
       }
     }
 
+    & figure {
+      padding: 10px;
+      margin: auto;
+      text-align: center;
+
+      & img {
+        margin-inline: 5px;
+      }
+
+      & figcaption {
+        font-size: 0.9rem;
+        text-align: center;
+      }
+    } 
+
     & ul {
       list-style-type: disc;
     }
