@@ -160,4 +160,11 @@ section[data-footnotes] {
     & .katex {
       margin-inline: 5px;
     }
+
+    & blockquote {
+      border-left: 4px solid #fffef6;
+      margin-block: 1rem;
+      padding-left: 1rem;
+      color: #c4c8c4;
+    }
 }
