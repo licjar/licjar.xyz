@@ -121,7 +121,6 @@ section[data-footnotes] {
     & li {
       margin-block: 0.5rem;
       margin-left: 1rem;
-      list-style-position: inside;
       & p {
         display: inline;
       }
@@ -158,6 +157,11 @@ section[data-footnotes] {
       white-space: pre-wrap;
       line-height: 1.5;
       text-align: left;
+    }
+    & hr {
+      border-top: 1px solid #fffef6;
+      margin-top: 2rem;
+      padding-top: 1rem;
     }
 
     & .katex {

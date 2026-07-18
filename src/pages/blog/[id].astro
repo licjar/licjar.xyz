@@ -4,7 +4,9 @@ import { formatDate } from "../../utils"
 import Layout from "../../layouts/Layout.astro";
 
 export async function getStaticPaths() {
-  const posts = await getCollection('blog');
+  const posts = await getCollection('blog', ({ data }) => {
+  return import.meta.env.PROD ? data.draft !== true : true;
+});
   return posts.map(post => ({
     params: { id: post.id }, 
     props: { post },

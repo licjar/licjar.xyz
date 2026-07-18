@@ -3,7 +3,9 @@ import Layout from "../../layouts/Layout.astro"
 import { formatDate } from "../../utils"
 import { getCollection } from "astro:content";
 
-const allPosts = await getCollection('misc');
+const allPosts = await getCollection('misc', ({ data }) => {
+  return import.meta.env.PROD ? data.draft !== true : true;
+});
 
 const sortedPosts = allPosts.sort((a, b) => {
     const diff =  b.data.date.valueOf() - a.data.date.valueOf()

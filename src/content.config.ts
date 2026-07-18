@@ -9,6 +9,7 @@ const blog = defineCollection({
     title: z.string(),
     date: z.date(),
     desc: z.string(),
+    draft: z.boolean().optional(),
   }),
 });
 
@@ -18,6 +19,7 @@ const misc = defineCollection({
     title: z.string(),
     date: z.date(),
     desc: z.string(),
+    draft: z.boolean().optional(),
   }),
 });
 
