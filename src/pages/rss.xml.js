@@ -2,8 +2,12 @@ import rss from '@astrojs/rss';
 import { getCollection } from 'astro:content';
 
 export async function GET(context) {
-  const blog = await getCollection('blog');
-  const misc = await getCollection('misc');
+  const blog = await getCollection('blog', ({ data }) => {
+  return import.meta.env.PROD ? data.draft !== true : true;
+});
+  const misc = await getCollection('misc', ({ data }) => {
+  return import.meta.env.PROD ? data.draft !== true : true;
+});
   console.log("RSS Feed triggered!");
   const allPosts = [...blog, ...misc];
 
