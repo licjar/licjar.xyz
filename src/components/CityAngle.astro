@@ -5,8 +5,9 @@ const parsedCities = csvString
   .trim()
   .split('\n')
   .map(line => {
-    const [name, lat, lon] = line.split(',');
+    const [nation, name, lat, lon] = line.split(',');
     return {
+      nation: nation.trim(),
       name: name.trim(),
       lat: parseFloat(lat),
       lon: parseFloat(lon)
@@ -75,6 +76,81 @@ class CityAngle extends HTMLElement {
     document.getElementById("guess-input").focus();
   }
 
+  setupAutocomplete() {
+    const input = this.querySelector('#guess-input');
+    const list = this.querySelector('#autocomplete-list'); // position: absolute で配置
+    let currentFocus = -1;
+    let matches = [];
+
+    // 入力によるリスト更新
+    input.addEventListener('input', (e) => {
+      const val = e.target.value;
+      list.innerHTML = '';
+      currentFocus = -1;
+      if (!val) return;
+
+      const lowerVal = val.toLowerCase();
+      matches = CITIES.filter(city => city.name.toLowerCase().startsWith(lowerVal) || city.nation.toLowerCase().startsWith(lowerVal));
+      console.log("Input:", val, "Matches:", matches);
+      matches.forEach((city, index) => {
+        const item = document.createElement('div');
+        item.textContent = city.name;
+        
+        // クリックでの選択 (mousedownを使用するとinputのblurより先に発火する)
+        item.addEventListener('mousedown', (e) => {
+          e.preventDefault();
+          input.value = city.name;
+          list.innerHTML = '';
+        });
+        item.addEventListener('mouseover', () => {
+          currentFocus = index;
+          this.addActive(list.querySelectorAll('div'), currentFocus);
+        });
+        list.appendChild(item);
+      });
+    });
+
+    // キーボード操作
+    input.addEventListener('keydown', (e) => {
+      const items = list.querySelectorAll('div');
+      if (items.length === 0) return;
+
+      if (e.key === 'ArrowDown') {
+        e.preventDefault();
+        currentFocus++;
+        if (currentFocus >= items.length) currentFocus = 0;
+        this.addActive(items, currentFocus);
+      } else if (e.key === 'ArrowUp') {
+        e.preventDefault();
+        currentFocus--;
+        if (currentFocus < 0) currentFocus = items.length - 1;
+        this.addActive(items, currentFocus);
+      } else if (e.key === 'Enter') {
+        e.preventDefault();
+        if (currentFocus > -1) {
+          console.log("Selected:", matches[currentFocus]);
+          input.value = matches[currentFocus].name;
+        } else if (items.length === 1) {
+          input.value = matches[0].name; // 候補が1つの場合はEnterで確定
+        } else if (items.length === 0) {
+          form.submit();
+        }
+        list.innerHTML = '';
+      }
+    });
+
+    // フォーカス外れでリストを隠す
+    input.addEventListener('blur', () => {
+      list.innerHTML = '';
+    });
+  }
+
+  addActive(items, index) {
+    items.forEach(item => item.classList.remove('active'));
+    items[index].classList.add('active');
+    // CSSで .active に背景色を設定する
+  }
+
   render() {
     // --- SVGの共通設定 ---
     const CX = 300; // ビューボックスの中心座標
@@ -88,10 +164,9 @@ class CityAngle extends HTMLElement {
     
     // ヒント都市リスト
     const hintListHtml = this.hints.map(h => {
-      const { dist } = this.calculateRelativity(this.target, h);
       return `
         <li>
-          <span class="hint-city-name">${h.name}</span>
+          <span class="hint-city-name"><span style="font-weight: bold; color: #f8c067">${h.name}</span>, ${h.nation}</span>
         </li>
       `;
     }).join('');
@@ -99,12 +174,11 @@ class CityAngle extends HTMLElement {
     // 回答履歴リスト
     const guessListHtml = this.guesses.map(g => {
       if (g.name === this.target.name) return `<li>
-          <span class="correct-city-name">${g.name}</span>: correct!
+          <span class="correct-city-name"><span style="font-weight: bold; color: #3288d3">${g.name}</span>, ${g.nation}</span> is correct!
         </li>`;
-      const { dist } = this.calculateRelativity(this.target, g);
       return `
         <li>
-          <span class="guess-city-name">${g.name}</span>
+          <span class="guess-city-name"><span style="font-weight: bold; color: #ff5871">${g.name}</span>, ${g.nation}</span>
         </li>
       `;
     }).join('');
@@ -189,7 +263,7 @@ class CityAngle extends HTMLElement {
 
     // --- 全体のHTML組み立て ---
     this.innerHTML = `
-      <div class="city-guesser-container">
+      <div class="city-angle-container">
         <div class="header">
             <h3>Compass</h3>
             <button id="reset-btn" type="button">Reset</button>
@@ -214,10 +288,8 @@ class CityAngle extends HTMLElement {
         </div>
         
         <form id="guess-form">
-          <input id="guess-input" list="city-list" placeholder="make a guess!" required />
-          <datalist id="city-list">
-            ${CITIES.map(c => `<option value="${c.name}">`).join('')}
-          </datalist>
+          <input id="guess-input" placeholder="make a guess!" autocomplete="off" required />
+          <div id="autocomplete-list" class="autocomplete-items"></div>
           <button type="submit">Guess</button>
         </form>
       </div>
@@ -227,6 +299,7 @@ class CityAngle extends HTMLElement {
     this.querySelector('#guess-form').addEventListener('submit', this.handleGuess.bind(this));
     // リセットボタンにイベントリスナーを登録
     this.querySelector('#reset-btn').addEventListener('click', this.resetGame.bind(this));
+    this.setupAutocomplete();
   }
 }
 
@@ -234,18 +307,18 @@ customElements.define('city-angle', CityAngle);
 </script>
 
 <style is:inline>
-  city-guesser {
+  city-angle {
     display: block;
     max-width: 800px; /* 少し広く */
     margin: 1rem auto;
   }
   
-  .city-guesser-container ul {
+  .city-angle-container ul {
     list-style: none;
     padding: 0;
   }
 
-  .city-guesser-container li {
+  .city-angle-container li {
     font-size: 14px;
     margin-bottom: 4px;
     line-height: 1.4;
@@ -281,31 +354,15 @@ customElements.define('city-angle', CityAngle);
       width: 200px
   }
 
-  /* リスト内の都市名スタイル */
-  .hint-city-name {
-    font-weight: bold;
-    color: #f8c067  
-  }
-
-  .correct-city-name {
-    font-weight: bold;
-    color: #3288d3  
-  }
-
-  .guess-city-name {
-    font-weight: bold;
-    color: #ff5871  
-  }
-
   /* ヘッダー周り */
-  .city-guesser-container .header {
+  .city-angle-container .header {
     display: flex;
     justify-content: space-between;
     align-items: center;
     margin-bottom: 1rem;
   }
 
-  .city-guesser-container .header h3 {
+  .city-angle-container .header h3 {
       margin: 0;
   }
 
@@ -319,12 +376,46 @@ customElements.define('city-angle', CityAngle);
   }
 
   /* フォームと入力フィールド */
+  /* 親要素を相対配置の基準にする */
   #guess-form {
+    position: relative; 
     display: flex;
     gap: 10px;
-    margin-top: 2rem;
-    padding-top: 1rem;
-    padding-bottom: 2rem;
+    margin-top: 1rem;
+  }
+
+  /* サジェストリストの絶対配置とスタイル */
+  .autocomplete-items {
+    position: absolute;
+    top: 100%; /* inputの直下に配置 */
+    left: 0;
+    right: 0; /* 右側のボタンに被らないよう調整する場合は width を指定 */
+    width: calc(100% - 90px); /* ボタン幅を除外する例 */
+    z-index: 99; /* 前面に表示 */
+    background-color: #fffef6;
+    max-height: 200px;
+    overflow-y: auto;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+  }
+
+  /* サジェストの各項目 */
+  .autocomplete-items div {
+    padding: 5px;
+    padding-left: 10px;
+    cursor: pointer;
+    color: #132028;
+    font-size: 14px;
+  }
+
+  .autocomplete-items div:last-child {
+    border-bottom: none;
+  }
+
+  /* ホバーおよびキーボード選択時のハイライト */
+  .autocomplete-items div.active {
+    background-color: #f8c067;
+    color: #132028;
+    font-weight: bold;
   }
 
   #guess-form input {
@@ -339,4 +430,4 @@ customElements.define('city-angle', CityAngle);
     cursor: pointer;
     font-weight: bold;
   }
-</
+</style>
