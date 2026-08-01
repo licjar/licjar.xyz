@@ -1,0 +1,342 @@
+---
+import csvString from '../data/cities.csv?raw';
+
+const parsedCities = csvString
+  .trim()
+  .split('\n')
+  .map(line => {
+    const [name, lat, lon] = line.split(',');
+    return {
+      name: name.trim(),
+      lat: parseFloat(lat),
+      lon: parseFloat(lon)
+    };
+  });
+---
+<city-angle></city-angle>
+
+<script define:vars={{ CITIES: parsedCities }}>
+
+class CityAngle extends HTMLElement {
+  constructor() {
+    super();
+    this.initGame();
+  }
+
+  connectedCallback() {
+    this.render();
+  }
+
+  initGame() {
+    this.target = CITIES[Math.floor(Math.random() * CITIES.length)];
+    this.hints = CITIES.filter(c => c.name !== this.target.name)
+                       .sort(() => 0.5 - Math.random())
+                       .slice(0, 5);
+    this.guesses = [];
+  }
+
+  resetGame() {
+    this.initGame();
+    this.render();
+  }
+
+  // 2点間の相対的な距離(km)と方位(°)を計算する
+  calculateRelativity(from, to) {
+    const R = 6371; // 地球の半径
+    const toRad = d => d * Math.PI / 180;
+    const dLat = toRad(to.lat - from.lat);
+    const dLon = toRad(to.lon - from.lon);
+    const lat1 = toRad(from.lat);
+    const lat2 = toRad(to.lat);
+
+    // ハーバーサイン公式による距離計算
+    const a = Math.sin(dLat/2)**2 + Math.cos(lat1) * Math.cos(lat2) * Math.sin(dLon/2)**2;
+    const dist = 2 * R * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+
+    // 方位角の計算
+    const y = Math.sin(dLon) * Math.cos(lat2);
+    const x = Math.cos(lat1) * Math.sin(lat2) - Math.sin(lat1) * Math.cos(lat2) * Math.cos(dLon);
+    let brng = Math.atan2(y, x) * 180 / Math.PI;
+    // 北を0°とし、時計回りに0〜360°に正規化
+    brng = (brng + 360) % 360;
+
+    return { dist: Math.round(dist), brng };
+  }
+
+  handleGuess(e) {
+    e.preventDefault();
+    const input = this.querySelector('input').value;
+    const city = CITIES.find(c => c.name === input);
+    // 未知の都市または既出の都市の場合は何もしない
+    if (!city || this.guesses.some(g => g.name === city.name)) return;
+
+    this.guesses.push(city);
+    this.render();
+    document.getElementById("guess-input").focus();
+  }
+
+  render() {
+    // --- SVGの共通設定 ---
+    const CX = 300; // ビューボックスの中心座標
+    const CY = 200;
+    const VIEWBOX_SIZE = 600; // ビューボックスのサイズ
+    const R_CIRCLE = 40; // 中央の円周の半径
+    const L_ARROW = 40; // 矢印の長さ
+    const R_ARROW_END = R_CIRCLE + L_ARROW; // 円の中心から矢印の先端までの距離
+
+    // --- テキストリスト（都市名と距離）の生成 ---
+    
+    // ヒント都市リスト
+    const hintListHtml = this.hints.map(h => {
+      const { dist } = this.calculateRelativity(this.target, h);
+      return `
+        <li>
+          <span class="hint-city-name">${h.name}</span>
+        </li>
+      `;
+    }).join('');
+
+    // 回答履歴リスト
+    const guessListHtml = this.guesses.map(g => {
+      if (g.name === this.target.name) return `<li>
+          <span class="correct-city-name">${g.name}</span>: correct!
+        </li>`;
+      const { dist } = this.calculateRelativity(this.target, g);
+      return `
+        <li>
+          <span class="guess-city-name">${g.name}</span>
+        </li>
+      `;
+    }).join('');
+
+
+    // --- 矢印（SVGフラグメント）の描画ロジック ---
+    
+    // 指定された1つの矢印（線、頭、テキスト）のSVGコードを生成する関数
+    const generateArrowFragment = (bearing, cityName, color) => {
+        const toRad = d => d * Math.PI / 180;
+        const rad = toRad(bearing);
+
+        // 矢印の頭（三角形）の設定
+        const arrowHeadSize = 15; // 少し大きく
+        const arrowHeadPath = `M 0 0 L ${arrowHeadSize} ${-arrowHeadSize/2} L ${arrowHeadSize} ${arrowHeadSize/2} Z`;
+
+        // テキスト（都市名）の配置ロジック
+        const R_TEXT_BASE = R_ARROW_END + 20; // 矢印の先から少し離す
+        let textAnchor, textXOffset = 0, textYOffset = 0;
+        const textMargin = 10;
+
+        if (bearing >= 45 && bearing <= 135) { // 東側
+          textAnchor = "start"; textXOffset = textMargin;
+        } else if (bearing > 135 && bearing < 225) { // 南側
+          textAnchor = "middle"; textYOffset = textMargin;
+        } else if (bearing >= 225 && bearing <= 315) { // 西側
+          textAnchor = "end"; textXOffset = -textMargin;
+        } else { // 北側
+          textAnchor = "middle"; textYOffset = -textMargin;
+        }
+
+        const xText = CX + R_TEXT_BASE * Math.sin(rad) + textXOffset;
+        const yText = CY - R_TEXT_BASE * Math.cos(rad) + textYOffset;
+
+        return `
+          <g class="arrow-group" data-city="${cityName}">
+            <!-- 円周上から外向きの矢印（線） -->
+            <g transform="rotate(${bearing} ${CX} ${CY})">
+              <line x1="${CX}" y1="${CY - R_CIRCLE}" x2="${CX}" y2="${CY - R_ARROW_END}" stroke="${color}" stroke-width="3" />
+              <!-- 矢印の頭（三角形）を先端に配置。-90度回転させて線の向きに合わせる -->
+              <g transform="translate(${CX} ${CY - R_ARROW_END - 5}) rotate(90)">
+                  <path d="${arrowHeadPath}" fill="${color}" />
+              </g>
+            </g>
+            
+            <!-- 対応する都市名 -->
+            <text x="${xText}" y="${yText}" text-anchor="${textAnchor}" dominant-baseline="middle" font-size="14" fill="${color}">
+              ${cityName}
+            </text>
+          </g>
+        `;
+    };
+
+    // --- コンパスSVG全体の組み立て ---
+
+    // すべてのヒント都市の矢印フラグメント
+    const hintArrowsHtml = this.hints.map(h => {
+      const { brng } = this.calculateRelativity(this.target, h);
+      return generateArrowFragment(brng, h.name, "#f8c067");
+    }).join('');
+
+    // すべての回答都市（不正解）の矢印フラグメント
+    const guessArrowsHtml = this.guesses.map(g => {
+      if (g.name === this.target.name) return ''; // 正解は描画しない
+      const { brng } = this.calculateRelativity(this.target, g);
+      return generateArrowFragment(brng, g.name, "#ff5871");
+    }).join('');
+
+    const compassSvgHtml = `
+      <svg class="compass-main" viewBox="0 0 ${VIEWBOX_SIZE} 400" width="100%" height="auto">
+        <!-- 円周 (ひとつだけ描く) -->
+        <circle cx="${CX}" cy="${CY}" r="${R_CIRCLE}" fill="none" stroke="#ccc" stroke-width="3" />
+        
+        <!-- 矢印たちを重ねて描画 -->
+        <g class="arrows-container">
+          ${hintArrowsHtml}
+          ${guessArrowsHtml}
+        </g>
+      </svg>
+    `;
+
+
+    // --- 全体のHTML組み立て ---
+    this.innerHTML = `
+      <div class="city-guesser-container">
+        <div class="header">
+            <h3>Compass</h3>
+            <button id="reset-btn" type="button">Reset</button>
+        </div>
+        
+        <div class="game-area">
+            <div class="compass-section">
+                ${compassSvgHtml}
+            </div>
+            
+            <div class="info-section">
+                <div class="hint-section">
+                <h4>Hints</h4>
+                <ul class="hint-list">${hintListHtml}</ul>
+                </div>
+
+                <div class="guess-section">
+                <h4>Log</h4>
+                <ul class="guess-list">${guessListHtml}</ul>
+                </div>
+            </div>
+        </div>
+        
+        <form id="guess-form">
+          <input id="guess-input" list="city-list" placeholder="make a guess!" required />
+          <datalist id="city-list">
+            ${CITIES.map(c => `<option value="${c.name}">`).join('')}
+          </datalist>
+          <button type="submit">Guess</button>
+        </form>
+      </div>
+    `;
+
+    // フォームにイベントリスナーを再登録
+    this.querySelector('#guess-form').addEventListener('submit', this.handleGuess.bind(this));
+    // リセットボタンにイベントリスナーを登録
+    this.querySelector('#reset-btn').addEventListener('click', this.resetGame.bind(this));
+  }
+}
+
+customElements.define('city-angle', CityAngle);
+</script>
+
+<style is:inline>
+  city-guesser {
+    display: block;
+    max-width: 800px; /* 少し広く */
+    margin: 1rem auto;
+  }
+  
+  .city-guesser-container ul {
+    list-style: none;
+    padding: 0;
+  }
+
+  .city-guesser-container li {
+    font-size: 14px;
+    margin-bottom: 4px;
+    line-height: 1.4;
+  }
+
+  /* ゲームエリアのレイアウト調整 */
+  .game-area {
+      margin-top: 1rem;
+      align-items: flex-start; /* 上揃え */
+  }
+
+  .compass-section {
+      flex: 1; /* コンパスエリアを広げる */
+      display: flex;
+      justify-content: center;
+      align-items: center;
+  }
+
+  /* メインのコンパスSVGのスタイル */
+  .compass-main {
+      max-width: 600px; /* SVG自体の最大幅 */
+      width: 100%;
+      height: auto;
+  }
+
+  .info-section {
+      display: flex;
+      gap: 20px;
+      flex-shrink: 0;
+  }
+
+  .info-section div {
+      width: 200px
+  }
+
+  /* リスト内の都市名スタイル */
+  .hint-city-name {
+    font-weight: bold;
+    color: #f8c067  
+  }
+
+  .correct-city-name {
+    font-weight: bold;
+    color: #3288d3  
+  }
+
+  .guess-city-name {
+    font-weight: bold;
+    color: #ff5871  
+  }
+
+  /* ヘッダー周り */
+  .city-guesser-container .header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1rem;
+  }
+
+  .city-guesser-container .header h3 {
+      margin: 0;
+  }
+
+  /* リセットボタン */
+  #reset-btn {
+    padding: 10px 20px;
+    background-color: #fffef6;
+    color: black;
+    cursor: pointer;
+    font-weight: bold;
+  }
+
+  /* フォームと入力フィールド */
+  #guess-form {
+    display: flex;
+    gap: 10px;
+    margin-top: 2rem;
+    padding-top: 1rem;
+    padding-bottom: 2rem;
+  }
+
+  #guess-form input {
+    flex-grow: 1;
+    padding: 10px;
+  }
+
+  #guess-form button {
+    padding: 10px 20px;
+    background-color: #f8c067;
+    color: #132028;
+    cursor: pointer;
+    font-weight: bold;
+  }
+</
