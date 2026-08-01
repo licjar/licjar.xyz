@@ -6,20 +6,18 @@ import remarkMath from 'remark-math';
 import rehypeKatex from 'rehype-katex';
 import remarkRuby from "remark-denden-ruby";
 
-// https://astro.build/config
 export default defineConfig({
-  integrations: [mdx({
+  markdown: {
     remarkPlugins: [remarkMath, remarkRuby],
     rehypePlugins: [rehypeKatex],
-  })],
+    shikiConfig: {
+      theme: 'css-variables',
+    },
+  },
+  integrations: [mdx()],
   image: {
     layout: 'constrained', 
     responsiveStyles: true,
   },
   site: 'https://licjar.xyz',
-  markdown: {
-    shikiConfig: {
-      theme: 'css-variables',
-    },
-  },
 });
