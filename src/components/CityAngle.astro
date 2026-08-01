@@ -94,7 +94,7 @@ class CityAngle extends HTMLElement {
       console.log("Input:", val, "Matches:", matches);
       matches.forEach((city, index) => {
         const item = document.createElement('div');
-        item.textContent = city.name;
+        item.innerHTML = `<span style="font-weight: bold">${city.name}</span>, ${city.nation}`;
         
         // クリックでの選択 (mousedownを使用するとinputのblurより先に発火する)
         item.addEventListener('mousedown', (e) => {
@@ -156,8 +156,8 @@ class CityAngle extends HTMLElement {
     const CX = 300; // ビューボックスの中心座標
     const CY = 200;
     const VIEWBOX_SIZE = 600; // ビューボックスのサイズ
-    const R_CIRCLE = 40; // 中央の円周の半径
-    const L_ARROW = 40; // 矢印の長さ
+    const R_CIRCLE = 60; // 中央の円周の半径
+    const L_ARROW = 60; // 矢印の長さ
     const R_ARROW_END = R_CIRCLE + L_ARROW; // 円の中心から矢印の先端までの距離
 
     // --- テキストリスト（都市名と距離）の生成 ---
@@ -188,11 +188,19 @@ class CityAngle extends HTMLElement {
     
     // 指定された1つの矢印（線、頭、テキスト）のSVGコードを生成する関数
     const generateArrowFragment = (bearing, cityName, color) => {
+      if (bearing < 0) return `
+          <g class="arrow-group" data-city="${cityName}">
+            <text x="${CX}" y="${CY}" text-anchor="middle" dominant-baseline="middle" font-size="14" fill="${color}" font-weight="bold">
+              ${cityName}
+            </text>
+          </g>
+        `; 
+      else {
         const toRad = d => d * Math.PI / 180;
         const rad = toRad(bearing);
 
         // 矢印の頭（三角形）の設定
-        const arrowHeadSize = 15; // 少し大きく
+        const arrowHeadSize = 20; // 少し大きく
         const arrowHeadPath = `M 0 0 L ${arrowHeadSize} ${-arrowHeadSize/2} L ${arrowHeadSize} ${arrowHeadSize/2} Z`;
 
         // テキスト（都市名）の配置ロジック
@@ -225,12 +233,12 @@ class CityAngle extends HTMLElement {
             </g>
             
             <!-- 対応する都市名 -->
-            <text x="${xText}" y="${yText}" text-anchor="${textAnchor}" dominant-baseline="middle" font-size="14" fill="${color}">
+            <text x="${xText}" y="${yText}" text-anchor="${textAnchor}" dominant-baseline="middle" font-size="16" fill="${color}">
               ${cityName}
             </text>
           </g>
         `;
-    };
+    }};
 
     // --- コンパスSVG全体の組み立て ---
 
@@ -242,7 +250,7 @@ class CityAngle extends HTMLElement {
 
     // すべての回答都市（不正解）の矢印フラグメント
     const guessArrowsHtml = this.guesses.map(g => {
-      if (g.name === this.target.name) return ''; // 正解は描画しない
+      if (g.name === this.target.name) return generateArrowFragment(-1, g.name, "#3288d3"); // 正解は描画しない
       const { brng } = this.calculateRelativity(this.target, g);
       return generateArrowFragment(brng, g.name, "#ff5871");
     }).join('');
