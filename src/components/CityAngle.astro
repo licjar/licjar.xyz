@@ -29,6 +29,7 @@ class CityAngle extends HTMLElement {
   }
 
   initGame() {
+    this.revealed = false;
     this.target = CITIES[Math.floor(Math.random() * CITIES.length)];
     console.log(this.target);
 
@@ -73,6 +74,7 @@ class CityAngle extends HTMLElement {
   reveal() {
     this.guesses.push(this.target);
     this.render(true);
+    this.revealed = true;
   }
 
   handleGuess(e) {
@@ -163,6 +165,7 @@ class CityAngle extends HTMLElement {
   }
 
   render(isreveal = false) {
+    if (this.revealed) return;
     // --- SVGの共通設定 ---
     const CX = 300; // ビューボックスの中心座標
     const CY = 200;
