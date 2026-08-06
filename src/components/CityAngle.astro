@@ -30,21 +30,44 @@ class CityAngle extends HTMLElement {
 
   initGame() {
     this.revealed = false;
-    this.target = CITIES[Math.floor(Math.random() * CITIES.length)];
-    console.log(this.target);
-
-    const availableCities = CITIES.filter(c => c.name !== this.target.name);
-    // Fisher-Yatesシャッフル（後ろから順にランダムな要素と交換）
-    for (let i = availableCities.length - 1; i > 0; i--) {
-      const j = Math.floor(Math.random() * (i + 1));
-      [availableCities[i], availableCities[j]] = [availableCities[j], availableCities[i]];
-    }
-    this.hints = availableCities.slice(0, 5);
+    const seedSet = new Set();
+    while (seedSet.size < 6) {
+      seedSet.add(Math.floor(Math.random() * CITIES.length));
+    };
+    this.seed = Array.from(seedSet);
+    this.target = CITIES[this.seed[0]];
+    this.hints = this.seed.map((s) => CITIES[s]).slice(1, 6);
     this.guesses = [];
   }
 
   resetGame() {
     this.initGame();
+    this.render();
+  }
+
+  async shareGame() {
+    const sharable = this.seed.map(x => x.toString(16).padStart(2, "0")).join('');
+    try {
+    await navigator.clipboard.writeText(sharable);
+    } catch (err) {
+      console.error('Failed to copy: ', err);
+    }
+  }
+
+  loadGame() {
+    const input = this.querySelector('#seed-input').value;
+    if (!/^[0-9a-fA-F]{12}$/.test(input)) {
+      alert("Invalid seed format. Please enter a 12-character hexadecimal string.");
+      return;
+    }
+    this.seed = [];
+    for (let i = 0; i < 6; i++) {
+      this.seed.push(parseInt(input.slice(i * 2, i * 2 + 2), 16));
+    }
+    this.target = CITIES[this.seed[0]];
+    this.hints = this.seed.map((s) => CITIES[s]).slice(1, 6);
+    this.guesses = [];
+    this.revealed = false;
     this.render();
   }
 
@@ -79,13 +102,16 @@ class CityAngle extends HTMLElement {
 
   handleGuess(e) {
     e.preventDefault();
-    const input = this.querySelector('input').value;
+    const input = this.querySelector('#guess-input').value;
     const city = CITIES.find(c => c.name === input);
     // 未知の都市または既出の都市の場合は何もしない
     if (!city || this.guesses.some(g => g.name === city.name)) return;
 
     this.guesses.push(city);
     this.render();
+    if (city.name === this.target.name) {
+      this.revealed = true;
+    };
     document.getElementById("guess-input").focus();
   }
 
@@ -290,14 +316,15 @@ class CityAngle extends HTMLElement {
     this.innerHTML = `
       <div class="city-angle-container">
         <div id="header">
-            <h3 class="game-title"> CityAngle v4 </h3>
+            <h3 class="game-title"> CityAngle v5 </h3>
             <div>
-            <button id="reveal-btn" type="button">Reveal</button>
-            <button id="reset-btn" type="button">Reset</button>
+            <button id="reveal-btn" type="button">Reveal</button><button id="reset-btn" type="button">Reset</button><button id="share-btn" type="button">Share Seed</button>
             </div>
         </div>
+        <form id="seed-form">
+        <input id="seed-input" placeholder="input the seed!" autocomplete="off" required /><button type="submit">Input Seed</button>
+        </form>
         <h4>Compass</h3>
-        
         <div class="game-area">
             <div class="compass-section">
                 ${compassSvgHtml}
@@ -329,6 +356,8 @@ class CityAngle extends HTMLElement {
     // リセットボタンにイベントリスナーを登録
     this.querySelector('#reset-btn').addEventListener('click', this.resetGame.bind(this));
     this.querySelector('#reveal-btn').addEventListener('click', this.reveal.bind(this));
+    this.querySelector('#share-btn').addEventListener('click', this.shareGame.bind(this));
+    this.querySelector('#seed-form').addEventListener('submit', this.loadGame.bind(this));
     this.setupAutocomplete();
   }
 }
@@ -416,6 +445,14 @@ customElements.define('city-angle', CityAngle);
     cursor: pointer;
     font-weight: bold;
   }
+  #share-btn {
+    padding: 10px 20px;
+    background-color: #fffef6;
+    color: black;
+    cursor: pointer;
+    font-weight: bold;
+    margin-left: 10px;
+  }
 
   /* フォームと入力フィールド */
   /* 親要素を相対配置の基準にする */
@@ -424,6 +461,14 @@ customElements.define('city-angle', CityAngle);
     display: flex;
     gap: 10px;
     margin-top: 1rem;
+    margin-bottom: 0.5rem;
+  }
+  #seed-form {
+    position: relative; 
+    display: flex;
+    gap: 10px;
+    margin-top: 1rem;
+    margin-bottom: 0.5rem;
   }
 
   /* サジェストリストの絶対配置とスタイル */
@@ -466,6 +511,19 @@ customElements.define('city-angle', CityAngle);
   }
 
   #guess-form button {
+    padding: 10px 20px;
+    background-color: #f8c067;
+    color: #132028;
+    cursor: pointer;
+    font-weight: bold;
+  }
+
+  #seed-form input {
+    flex-grow: 1;
+    padding: 10px;
+  }
+
+  #seed-form button {
     padding: 10px 20px;
     background-color: #f8c067;
     color: #132028;
