@@ -30,6 +30,7 @@ class CityAngle extends HTMLElement {
 
   initGame() {
     this.target = CITIES[Math.floor(Math.random() * CITIES.length)];
+    console.log(this.target);
 
     const availableCities = CITIES.filter(c => c.name !== this.target.name);
     // Fisher-Yatesシャッフル（後ろから順にランダムな要素と交換）
@@ -67,6 +68,11 @@ class CityAngle extends HTMLElement {
     brng = (brng + 360) % 360;
 
     return { dist: Math.round(dist), brng };
+  }
+  
+  reveal() {
+    this.guesses.push(this.target);
+    this.render(true);
   }
 
   handleGuess(e) {
@@ -156,7 +162,7 @@ class CityAngle extends HTMLElement {
     // CSSで .active に背景色を設定する
   }
 
-  render() {
+  render(isreveal = false) {
     // --- SVGの共通設定 ---
     const CX = 300; // ビューボックスの中心座標
     const CY = 200;
@@ -178,8 +184,11 @@ class CityAngle extends HTMLElement {
 
     // 回答履歴リスト
     const guessListHtml = this.guesses.map(g => {
-      if (g.name === this.target.name) return `<li>
+      if (g.name === this.target.name && isreveal == false) return `<li>
           <span class="correct-city-name"><span style="font-weight: bold; color: #3288d3">${g.name}</span>, ${g.nation}</span> is correct!
+        </li>`;
+      if (g.name === this.target.name && isreveal == true) return `<li>
+          <span class="correct-city-name"><span style="font-weight: bold; color: #3288d3">${g.name}</span>, ${g.nation}</span> was the answer.
         </li>`;
       return `
         <li>
@@ -277,10 +286,14 @@ class CityAngle extends HTMLElement {
     // --- 全体のHTML組み立て ---
     this.innerHTML = `
       <div class="city-angle-container">
-        <div class="header">
-            <h3>Compass</h3>
+        <div id="header">
+            <h3 class="game-title"> CityAngle v4 </h3>
+            <div>
+            <button id="reveal-btn" type="button">Reveal</button>
             <button id="reset-btn" type="button">Reset</button>
+            </div>
         </div>
+        <h4>Compass</h3>
         
         <div class="game-area">
             <div class="compass-section">
@@ -312,6 +325,7 @@ class CityAngle extends HTMLElement {
     this.querySelector('#guess-form').addEventListener('submit', this.handleGuess.bind(this));
     // リセットボタンにイベントリスナーを登録
     this.querySelector('#reset-btn').addEventListener('click', this.resetGame.bind(this));
+    this.querySelector('#reveal-btn').addEventListener('click', this.reveal.bind(this));
     this.setupAutocomplete();
   }
 }
@@ -368,19 +382,31 @@ customElements.define('city-angle', CityAngle);
   }
 
   /* ヘッダー周り */
-  .city-angle-container .header {
+  .city-angle-container #header {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 1rem;
+    margin-bottom: 0;
   }
 
-  .city-angle-container .header h3 {
+  #header h3.game-title {
       margin: 0;
+  }
+
+  .city-angle-container h4 {
+    margin: 10px;
   }
 
   /* リセットボタン */
   #reset-btn {
+    padding: 10px 20px;
+    background-color: #fffef6;
+    color: black;
+    cursor: pointer;
+    font-weight: bold;
+    margin-left: 10px;
+  }
+  #reveal-btn {
     padding: 10px 20px;
     background-color: #fffef6;
     color: black;
